@@ -1,0 +1,58 @@
+encoding: utf-8
+
+plugins:
+  - jekyll-regex-replace
+
+# SEO
+title: Efe Blog
+description: Efe Blog Sayfası
+keywords: SAP,Fiori,Blog,ABAP,JavaScript
+author: Efe
+footerText: 'Copyright © 2024 Efe Umut Aslan'
+
+# Don’t touch these
+permalink: /posts/:year/:month/:day/:title.html
+kramdown:
+  auto_ids: true
+  input: GFM
+  syntax_highlighter: rouge
+exclude: ['CNAME', 'README.md', 'LICENSE', '_site', 'dist', 'Gemfile', 'Gemfile.lock', 'blog.sh']
+
+# Domain name configuration
+#baseurl configuration, if the website is deployed in other directories under the root directory, please set it to /directory name
+domainUrl: 'https://efeumutaslan.github.io'
+baseurl: ''
+
+# menu
+# Required fields title: 'Text' url: 'Link'
+# Optional field target: '_blank' New page opens
+menu:
+  - title: Anasayfa
+    url: /
+  - title: Kategoriler
+    url: /pages/categories.html
+  - title: Arama
+    url: /pages/search.html
+  - title: Takip Listem
+    url: /pages/links.html
+  - title: Hakkımda
+    url: /pages/about.html
+
+# Click on the page text to pop up special effects. If not required, please set it to false.
+extClickEffect: true
+
+# Google Adsense, if not required please set to false
+# _includes/ext-adsense.html Modify it to your own configuration
+extAdsense: false
+
+# Mathematical formula support, which affects loading speed. If not required, please set it to false.
+extMath: false
+
+# Display traffic statistics, service provided by Busuanzi
+extCount: false
+
+# Friendly links
+links:
+  - title: SAP Devs
+    url: https://www.youtube.com/@sapdevs
+
