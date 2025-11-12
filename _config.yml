@@ -4,10 +4,10 @@ plugins:
   - jekyll-regex-replace
 
 # SEO
-title: Efe Blog
-description: Efe Blog Sayfası
-keywords: SAP,Fiori,Blog,ABAP,JavaScript
-author: Efe
+title: Efe's Dev Logs
+description: Learning experiments, technical insights, and development logs
+keywords: SAP,Fiori,ABAP,JavaScript,Development,Learning,Technical Writing
+author: Efe Umut Aslan
 footerText: 'Copyright © 2024 Efe Umut Aslan'
 
 # Don’t touch these
@@ -27,15 +27,15 @@ baseurl: ''
 # Required fields title: 'Text' url: 'Link'
 # Optional field target: '_blank' New page opens
 menu:
-  - title: Anasayfa
+  - title: Home
     url: /
-  - title: Kategoriler
+  - title: Categories
     url: /pages/categories.html
-  - title: Arama
+  - title: Search
     url: /pages/search.html
-  - title: Takip Listem
+  - title: Links
     url: /pages/links.html
-  - title: Hakkımda
+  - title: About
     url: /pages/about.html
 
 # Click on the page text to pop up special effects. If not required, please set it to false.

@@ -1,9 +1,9 @@
 ---
 layout: mypost
-title: Takip Listem
+title: Links
 ---
 
-Takip Ettiğim Araştırma Kaynaklarını Burada Tutuyorum
+Resources I follow and find valuable for learning and research
 
 <!-- >
 ```

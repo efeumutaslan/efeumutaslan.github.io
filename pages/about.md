@@ -1,25 +1,25 @@
 ---
 layout: mypost
-title: Hakkımda
+title: About
 ---
 
-> Merhaba yabancı, Bloguma Hoş Geldin
+> Hello stranger, welcome to my blog
 
-Merhaba! Ben Efe, SAP Fiori ve ABAP programlama konularında merak salmış bu süreçte araştırdığı ve öğrendiği yeni bilgileri bu sayfa üzerinden notlayarak hem kendime hem de ihtiyacı olanlara bir kaynak oluşturmaya çalışıyorum.
+Hi! I'm Efe, a developer passionate about SAP Fiori and ABAP programming. I document my research and learnings here to create a resource for myself and anyone who might find it useful.
 
-## Yolculuğum
-Profesyonel yolculuğuma Secure Computing'de Full Stack Developer Stajyeri olarak başladım, burada React.JS, MVC yapısı ve Atomic Design konularında becerilerimi geliştirdim. Bu süre zarfında SonarQube ve JIRA gibi araçları kullanma şansı buldum. Bu stajdan edindiğim javascript geliştirme ortamını SAP alanında yenilikçi ERP çözümleri üretebilmek için kullanabileceğimi farkettim. Ve kariyerime bu şekilde yön verdim.
+## My Journey
+I began my professional journey as a Full Stack Developer Intern at Secure Computing, where I developed skills in React.JS, MVC architecture, and Atomic Design. During this time, I gained experience with tools like SonarQube and JIRA. I realized I could leverage my JavaScript development expertise to create innovative ERP solutions in the SAP ecosystem, and that's how I shaped my career path.
 
-## Yetenekler
+## Skills
 1. SAP Fiori / ABAP
 2. JavaScript
 
-## Eğitim
-İstanbul'da Bahçeşehir Üniversitesi'nden Yazılım Mühendisliği alanında lisans diplomasına sahibim. Akademik ve profesyonel kariyerim boyunca, SAP teknolojileri, SAP S/4HANA Cloud, ABAP Cloud ve SAP S/4HANA ile İş Süreci Entegrasyonu dahil olmak üzere çeşitli sertifikalar edindim.
+## Education
+I hold a Bachelor's degree in Software Engineering from Bahçeşehir University in Istanbul. Throughout my academic and professional career, I've earned various certifications including SAP technologies, SAP S/4HANA Cloud, ABAP Cloud, and Business Process Integration with SAP S/4HANA.
 
-## Diller
-Türkçe: Anadil <br>
-İngilizce: Profesyonel
+## Languages
+Turkish: Native <br>
+English: Professional
 
 - Email&nbsp;: [efeumutaslan@hotmail.com](mailto:efeumutaslan@hotmail.com)
 

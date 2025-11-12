@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 {% include head.html -%}
 <body>
 {% include header.html -%}
@@ -7,7 +7,7 @@
   <h1 class="title" id="{{ page.title }}">{{ page.title }}</h1>
   {% if page.date %}
   <div class="subtitle">
-    <span>{{site.author}} {{ page.date | date: "%d-%m-%Y" }} tarihinde yayınladı</span>
+    <span>{{site.author}} published on {{ page.date | date: "%B %d, %Y" }}</span>
     {%- if site.extCount %}
       <span>Views</span>
       <span id="busuanzi_value_page_pv"></span>
