@@ -1,73 +1,73 @@
 ---
 layout: mypost
-title: Teknik Yazım - Yazılım Dokümantasyonu Nasıl Yazılır
-categories: [Genel]
+title: Technical Writing - How to Write Software Documentation
+categories: [Technical Writing]
 ---
-# Teknik Yazım - Yazılım Dokümantasyonu Nasıl Yazılır
-Bu yazıda, Jordan Stanchev’in “Technical Writing: How to Write Software Documentation” adlı online kursundan aldığım notları paylaşacağım. Bu kursu, hem kursta öğrendiklerimi uygulamak hem de gelecekte yazacağım blog yazılarında daha kaliteli dokümantasyon oluşturmak amacıyla satın aldım. Kurstan öğrendiklerim şunlardır:
+# Technical Writing - How to Write Software Documentation
+In this post, I'll share my notes from Jordan Stanchev's online course "Technical Writing: How to Write Software Documentation." I purchased this course both to apply what I learned and to create better quality documentation in my future blog posts. Here's what I learned from the course:
 
-Teknik dokümantasyonda, ürünün veya servisin ne için geliştirildiğini ve neler sunduğunu açıklamaya çalışırız. 
-## Teknik Dokümantasyonun adımları şu şekildedir;
-* ### Plan Yapmak
-Ne yapacağın, nasıl yapacağının bir planını oluşturmak.
-* ### Hazırlamak
-İlk bilgi setinin taslağını çıkarmak.
-* ### Oluşturmak
-Hazırlanan taslaklardan içeriği oluşturmak.
-* ### Organize etmek ve yapılandırmak
-Hazırlanan içeriği kullanıcının nasıl etkileşime gireceğine göre organize etmek.
-* ### Sınıflandırmak
-İçeriği organize ettikten sonra içeriği ek olarak farklı metadata, labeling, tagging kullanarak sınıflandırmak bu sayede son kullanıcıya arama yapması ve tekrar bulması daha kolaylaşır.
-* ### Yayınlamak
-Hazırlanan içeriği son kullanıcılar ile paylaşmak, yayınlamak.
-* ### Bakımını Yapmak
-Yayınlanan içeriği güncel tutmak, ürünün veya servisin yayınlanmasına göre aynı tempoda bakımını yapmak.
+In technical documentation, we try to explain what the product or service was developed for and what it offers.
+## The Steps of Technical Documentation Are:
+* ### Planning
+Creating a plan for what you'll do and how you'll do it.
+* ### Preparing
+Drafting the initial information set.
+* ### Creating
+Creating content from the prepared drafts.
+* ### Organizing and Structuring
+Organizing the prepared content according to how users will interact with it.
+* ### Classifying
+After organizing the content, additionally classifying it using different metadata, labeling, and tagging, making it easier for end users to search and find again.
+* ### Publishing
+Sharing and publishing the prepared content with end users.
+* ### Maintaining
+Keeping the published content up to date, maintaining it at the same pace as the product or service release.
 
->Son olarak bu içeriği kimler için hazırlandığını her zaman aklında tutmak.
+>Finally, always keep in mind who this content is being prepared for.
 
-## Yaygın Dokümantasyonun Tipleri
-### Fonksiyonel Dokümantasyon
-* Yeni bir ürünle başlamak için uygundur.
-* Karşınızda ne gördüğünüzü açıklar.
-* Üründe yolunuzu bulmanıza yardımcı olur.
-* Genellikle fiziksel ürünler için kullanılır.
- 
+## Common Types of Documentation
+### Functional Documentation
+* Suitable for getting started with a new product.
+* Explains what you see in front of you.
+* Helps you find your way around the product.
+* Generally used for physical products.
+
  ![01](01.jpg)
-[Kaynak: Cefla Finishing](https://www.ceflafinishing.com/en/magazine/how-many-car-parts-can-we-help-you-coat-our-technologies).
-* Fonksiyonel Dokümantasyon yazarken yapılan en büyük hatalardan birisi fonksiyonel dokümantasyonun tek başına yeterli olacağı düşüncesidir. Eğer sadece fonksiyonel dokümantasyon yayınlanırsa son kullanıcı için kullanışsız bir dokümantasyon olacaktır. Yazılım dokümantasyonları genellikle son kullanıcı birkaç şey biliyor olarak gelecektir. Elbette başlangıç için bir dokümantasyon ve yazılımı son kullanıcılara tanıtacak bir dokümantasyon yazılmalı ama bu asıl dokümantasyon değildir.
+[Source: Cefla Finishing](https://www.ceflafinishing.com/en/magazine/how-many-car-parts-can-we-help-you-coat-our-technologies).
+* One of the biggest mistakes made when writing Functional Documentation is thinking that functional documentation alone will be sufficient. If only functional documentation is published, it will be useless documentation for the end user. Software documentation typically assumes the end user knows a few things. Of course, introductory documentation should be written to introduce the software to end users, but this is not the main documentation.
  ![02](02.png)
-[Referans: Apple | Keynote](https://support.apple.com/tr-tr/guide/keynote/tan72232820/14.1/mac/1.0).
-### Fonksiyonel Dokümantasyon Yazma Stratejileri
-1. Başlangıç ekranı ile başlayın.
-2. Sayfaları ve ne amaçla kullanıldıklarını açıklayın.
-3. Kullanıcılara ekranda ne gördüklerini anlatın (başlangıç olarak nelere ihtiyacı olduklarını bütün detayları tek ekranda vermek karmaşıklık yaratabilir).
-4. Arayüzde görünme sırasına göre organize edin.
+[Reference: Apple | Keynote](https://support.apple.com/tr-tr/guide/keynote/tan72232820/14.1/mac/1.0).
+### Functional Documentation Writing Strategies
+1. Start with the home screen.
+2. Explain the pages and what they're used for.
+3. Tell users what they see on the screen (providing all details on one screen as a starting point can create complexity).
+4. Organize according to appearance order in the interface.
 
-### Görev Odaklı Dokümantasyon
-* Bir ürünün ileri düzey kullanımı için uygundur.
-* Karşınızda ne gördüğünüzü neredeyse hiç açıklamaz; bunun yerine belirli bir sonuca nasıl ulaşılacağına anlatır.
-* Üründe veya birden fazla ilgili üründe yolunuzu bulmanıza yardımcı olur.
-* Genellikle yazılım ürünleri için kullanılır.
-* Bir sürecin adımlarını size rehberlik eder.
+### Task-Oriented Documentation
+* Suitable for advanced use of a product.
+* Hardly explains what you see in front of you; instead, it tells you how to achieve a specific outcome.
+* Helps you find your way around the product or multiple related products.
+* Generally used for software products.
+* Guides you through the steps of a process.
 
->Kullanıcı, arama motoruna “ekranımda gördüğüm buton ne işe yarar” gibi bir arama yapmaz. Bu tür bir arama kullanıcı perspektifinde anlamsızdır. Kullanıcılar dokümantasyonunuzda bir şeyi gerçekleştirmek, başarmak ister. Yazılımdaki belirli bir problemi çözmek ister. İşte burada görev odaklı “task-oriented” dokümantasyon devreye girer. Görev odaklı dokümantasyonunuzda kullanıcının aradığı cevabı bulmasına yardımcı olmanız gerekir. Amaç, yazılımın nasıl kullanılacağını değil, yapılması gereken işlemin nasıl yapılacağını anlatmaktır.
+>Users don't search "what does this button I see on my screen do?" in search engines. This type of search is meaningless from a user's perspective. Users want to accomplish something in your documentation, to achieve a goal. They want to solve a specific problem in the software. This is where task-oriented documentation comes in. In your task-oriented documentation, you need to help users find the answer they're looking for. The goal is not to explain how to use the software, but how to perform the task that needs to be done.
 
-### Görev Odaklı Dokümantasyon Yazma Stratejisi
-1. Müşterinin gerçekleştirmesi gereken görevleri belirleyin.
-2. Bu görevleri mantıksal bir sıraya dizin.
-3. Müşterinin bilmesi gereken destekleyici kavramları ve bilgileri ekleyin.
-4. Ürünü daha iyi tanıdıktan sonra onlara yardımcı olacak destekleyici referans bilgileri ekleyin.
+### Task-Oriented Documentation Writing Strategy
+1. Identify the tasks the customer needs to accomplish.
+2. Arrange these tasks in a logical order.
+3. Add supporting concepts and information the customer needs to know.
+4. Add supporting reference information that will help them after they become more familiar with the product.
 
->Yazılım konseptleri görsel olarak açıklanabiliyorsa, uygun görsellerle anlatmak en iyi format olacaktır. Günümüzde çoğu kullanıcı, uzun metin belgelerini okumayı sıkıcı bulduğu için metinleri atlayarak okur veya hiç okumaz. Bu nedenle uzun metinlerden kaçınılmalıdır.
+>If software concepts can be explained visually, explaining them with appropriate visuals will be the best format. Today, most users find reading long text documents boring, so they skip through texts or don't read them at all. Therefore, long texts should be avoided.
 
-*Özet Olarak*
-* Araştırma yapın ve bilgi toplayın
-* Tüm bilgileri yazmaya başlayın "Bilgi yığını"
-* Bilgiyi yapılandırmaya ve düzenlemeye başlayın "Taslak"
-* İlgili taraflara sunun ve geri bildirim toplayın
-* Geri bildirimi dokümantasyona yansıtın
-* Son teslimatı hazırlayın
-* Yayınlayın
-* Müşteri geri bildirimlerini toplayın ve dokümantasyonu güncel tutun
+*In Summary*
+* Research and gather information
+* Start writing all information "Information pile"
+* Start structuring and organizing the information "Draft"
+* Present to relevant parties and collect feedback
+* Reflect feedback in documentation
+* Prepare final delivery
+* Publish
+* Collect customer feedback and keep documentation up to date
 
->Hazırladığım notları Junior olduğumu göz önüne koyarak referans alın. Hatalarım ve yanlışlarım olabilir.
+>Take the notes I've prepared as reference considering that I'm a Junior. I may have errors and mistakes.

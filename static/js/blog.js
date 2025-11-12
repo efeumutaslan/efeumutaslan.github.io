@@ -190,19 +190,25 @@ blog.ajax = function (option, success, fail) {
  * 特效：点击页面文字冒出特效
  */
 blog.initClickEffect = function (textArr) {
+  var colors = ['#00ffff', '#ff00ff', '#bd93f9', '#50fa7b', '#ff79c6']
   function createDOM(text) {
     var dom = document.createElement('span')
+    var color = colors[parseInt(Math.random() * colors.length)]
     dom.innerText = text
     dom.style.left = 0
     dom.style.top = 0
     dom.style.position = 'fixed'
-    dom.style.fontSize = '12px'
+    dom.style.fontSize = '14px'
+    dom.style.fontWeight = 'bold'
+    dom.style.color = color
+    dom.style.textShadow = '0 0 10px ' + color + ', 0 0 20px ' + color
     dom.style.whiteSpace = 'nowrap'
     dom.style.webkitUserSelect = 'none'
     dom.style.userSelect = 'none'
     dom.style.opacity = 0
-    dom.style.transform = 'translateY(0)'
-    dom.style.webkitTransform = 'translateY(0)'
+    dom.style.transform = 'translateY(0) scale(0.5)'
+    dom.style.webkitTransform = 'translateY(0) scale(0.5)'
+    dom.style.pointerEvents = 'none'
     return dom
   }
 
@@ -227,17 +233,17 @@ blog.initClickEffect = function (textArr) {
     dom.style.opacity = 1
 
     setTimeout(function () {
-      dom.style.transition = 'transform 500ms ease-out, opacity 500ms ease-out'
-      dom.style.webkitTransition = 'transform 500ms ease-out, opacity 500ms ease-out'
+      dom.style.transition = 'transform 600ms cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 600ms ease-out'
+      dom.style.webkitTransition = 'transform 600ms cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 600ms ease-out'
       dom.style.opacity = 0
-      dom.style.transform = 'translateY(-26px)'
-      dom.style.webkitTransform = 'translateY(-26px)'
+      dom.style.transform = 'translateY(-40px) scale(1.2) rotate(' + (Math.random() * 20 - 10) + 'deg)'
+      dom.style.webkitTransform = 'translateY(-40px) scale(1.2) rotate(' + (Math.random() * 20 - 10) + 'deg)'
     }, 20)
 
     setTimeout(function () {
       document.body.removeChild(dom)
       dom = null
-    }, 520)
+    }, 620)
   })
 }
 
