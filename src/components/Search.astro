@@ -1,0 +1,306 @@
+---
+import { LOCALES, type Locale } from '../consts';
+import { localePath } from '../i18n/utils';
+import { languageNames, ui } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = ui[locale];
+
+const placeholders: Record<Locale, string> = {
+  en: 'Search or jump to…',
+  tr: 'Ara ya da git…',
+  de: 'Suchen oder springen zu…',
+};
+const labels: Record<Locale, { zero: string; close: string; commands: string; posts: string; theme: string; lightLbl: string; darkLbl: string; languageLbl: string }> = {
+  en: { zero: 'No results', close: 'Close', commands: 'Commands', posts: 'Posts', theme: 'Toggle theme', lightLbl: 'Light', darkLbl: 'Dark', languageLbl: 'Switch language' },
+  tr: { zero: 'Sonuç yok', close: 'Kapat', commands: 'Komutlar', posts: 'Yazılar', theme: 'Tema değiştir', lightLbl: 'Açık', darkLbl: 'Koyu', languageLbl: 'Dili değiştir' },
+  de: { zero: 'Keine Ergebnisse', close: 'Schließen', commands: 'Befehle', posts: 'Beiträge', theme: 'Thema umschalten', lightLbl: 'Hell', darkLbl: 'Dunkel', languageLbl: 'Sprache wechseln' },
+};
+
+const placeholder = placeholders[locale];
+const L = labels[locale];
+const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
+
+type Cmd = { id: string; label: string; hint?: string; kind: 'nav' | 'theme' | 'lang'; href?: string; value?: string };
+const commands: Cmd[] = [
+  { id: 'home', label: t.nav.home, hint: '/' + locale, kind: 'nav', href: localePath(locale) },
+  { id: 'blog', label: t.nav.blog, hint: '/' + locale + '/blog', kind: 'nav', href: localePath(locale, 'blog') },
+  { id: 'about', label: t.nav.about, hint: '/' + locale + '/about', kind: 'nav', href: localePath(locale, 'about') },
+  { id: 'theme-toggle', label: L.theme, hint: L.lightLbl + ' / ' + L.darkLbl, kind: 'theme' },
+  ...LOCALES.filter((l) => l !== locale).map((l) => ({
+    id: `lang-${l}`,
+    label: `${L.languageLbl}: ${languageNames[l]}`,
+    hint: '/' + l,
+    kind: 'lang' as const,
+    value: l,
+  })),
+];
+---
+
+<div class="relative" data-search-root>
+  <button
+    type="button"
+    class="inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-slate-200 px-2 text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+    aria-label={placeholder}
+    data-search-open
+  >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="h-4 w-4" aria-hidden="true">
+      <circle cx="11" cy="11" r="7"></circle>
+      <path d="m20 20-3.5-3.5"></path>
+    </svg>
+    <kbd class="hidden rounded border border-slate-200 bg-slate-50 px-1 text-[0.65rem] text-slate-500 sm:inline-block dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400" data-search-kbd></kbd>
+  </button>
+
+  <div
+    class="fixed inset-0 z-50 hidden items-start justify-center bg-slate-900/40 p-4 pt-24 backdrop-blur-sm"
+    data-search-overlay
+    aria-hidden="true"
+  >
+    <div class="w-full max-w-xl rounded-xl border border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-900">
+      <div class="flex items-center gap-2 border-b border-slate-200 p-3 dark:border-slate-800">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="h-4 w-4 text-slate-400" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m20 20-3.5-3.5"></path>
+        </svg>
+        <input
+          type="search"
+          class="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400 dark:text-white"
+          placeholder={placeholder}
+          autocomplete="off"
+          data-search-input
+        />
+        <button
+          type="button"
+          class="rounded border border-slate-200 px-2 py-0.5 text-xs text-slate-500 dark:border-slate-700 dark:text-slate-400"
+          data-search-close
+          aria-label={L.close}
+        >
+          Esc
+        </button>
+      </div>
+      <div class="max-h-[60vh] overflow-y-auto p-2" data-search-results
+        data-empty-label={L.zero}
+        data-commands-label={L.commands}
+        data-posts-label={L.posts}
+        data-commands={JSON.stringify(commands)}
+      ></div>
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ locale, base }}>
+  let pagefindPromise;
+  const loadPagefind = () => {
+    if (!pagefindPromise) {
+      pagefindPromise = import(/* @vite-ignore */ `${base}/pagefind/pagefind.js`).catch(() => null);
+    }
+    return pagefindPromise;
+  };
+
+  const escapeHtml = (s) =>
+    s.replace(/[&<>"']/g, (c) =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c],
+    );
+
+  const switchLocale = (target) => {
+    const path = window.location.pathname;
+    const parts = path.split('/').filter(Boolean);
+    const first = parts[0];
+    if (first && ['en', 'tr', 'de'].includes(first)) parts[0] = target;
+    else parts.unshift(target);
+    const rebuilt = '/' + parts.join('/') + (path.endsWith('/') ? '/' : '');
+    window.location.href = rebuilt;
+  };
+
+  const toggleTheme = () => {
+    const dark = !document.documentElement.classList.contains('dark');
+    document.documentElement.classList.toggle('dark', dark);
+    localStorage.setItem('theme', dark ? 'dark' : 'light');
+  };
+
+  const runCommand = (c) => {
+    if (c.kind === 'nav' && c.href) window.location.href = c.href;
+    else if (c.kind === 'theme') toggleTheme();
+    else if (c.kind === 'lang' && c.value) switchLocale(c.value);
+  };
+
+  let selectedIndex = 0;
+  let lastItems = [];
+
+  const renderItems = (resultsEl, items) => {
+    lastItems = items;
+    selectedIndex = 0;
+    resultsEl.innerHTML = items
+      .map((it, i) =>
+        it.type === 'header'
+          ? `<p class="px-3 pt-3 pb-1 text-[0.65rem] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">${escapeHtml(it.label)}</p>`
+          : `<a href="${it.href || '#'}" data-idx="${i}" class="search-item flex items-start justify-between gap-3 rounded-md p-3 hover:bg-slate-100 dark:hover:bg-slate-800">
+              <div class="min-w-0">
+                <div class="text-sm font-semibold text-slate-900 dark:text-white truncate">${escapeHtml(it.title || '')}</div>
+                ${it.excerpt ? `<div class="mt-1 text-xs text-slate-600 dark:text-slate-400 line-clamp-2">${it.excerpt}</div>` : ''}
+              </div>
+              ${it.hint ? `<span class="mt-0.5 shrink-0 text-[0.65rem] text-slate-400">${escapeHtml(it.hint)}</span>` : ''}
+            </a>`,
+      )
+      .join('');
+    highlight(resultsEl);
+  };
+
+  const highlight = (resultsEl) => {
+    const nodes = resultsEl.querySelectorAll('.search-item');
+    nodes.forEach((el, i) => {
+      if (i === selectedIndex) el.classList.add('bg-slate-100', 'dark:bg-slate-800');
+      else el.classList.remove('bg-slate-100', 'dark:bg-slate-800');
+    });
+  };
+
+  const activate = (resultsEl) => {
+    const item = lastItems[selectedIndex];
+    if (!item || item.type === 'header') return;
+    if (item.command) runCommand(item.command);
+    else if (item.href) window.location.href = item.href;
+  };
+
+  const render = async (query, resultsEl) => {
+    const q = query.toLowerCase();
+    const commands = JSON.parse(resultsEl.dataset.commands || '[]');
+
+    const matchedCommands = !q
+      ? commands
+      : commands.filter((c) => c.label.toLowerCase().includes(q) || (c.hint || '').toLowerCase().includes(q));
+
+    const items = [];
+    if (matchedCommands.length) {
+      items.push({ type: 'header', label: resultsEl.dataset.commandsLabel });
+      for (const c of matchedCommands) {
+        items.push({
+          type: 'item',
+          title: c.label,
+          hint: c.hint,
+          command: c,
+        });
+      }
+    }
+
+    if (q.length >= 2) {
+      const pagefind = await loadPagefind();
+      if (pagefind) {
+        const search = await pagefind.search(query, { filters: { lang: locale } });
+        const top = await Promise.all(search.results.slice(0, 6).map((r) => r.data()));
+        if (top.length) {
+          items.push({ type: 'header', label: resultsEl.dataset.postsLabel });
+          for (const d of top) {
+            items.push({
+              type: 'item',
+              title: d.meta.title || d.url,
+              excerpt: d.excerpt,
+              href: d.url,
+            });
+          }
+        }
+      }
+    }
+
+    if (!items.length) {
+      resultsEl.innerHTML = `<p class="p-4 text-sm text-slate-500">${resultsEl.dataset.emptyLabel}</p>`;
+      lastItems = [];
+      return;
+    }
+
+    renderItems(resultsEl, items);
+  };
+
+  const bind = () => {
+    const root = document.querySelector('[data-search-root]');
+    if (!root || root.dataset.bound === '1') return;
+    root.dataset.bound = '1';
+
+    const overlay = root.querySelector('[data-search-overlay]');
+    const input = root.querySelector('[data-search-input]');
+    const results = root.querySelector('[data-search-results]');
+    const open = root.querySelector('[data-search-open]');
+    const close = root.querySelector('[data-search-close]');
+    const kbd = root.querySelector('[data-search-kbd]');
+
+    const isMac = /Mac|iPhone|iPad/.test(navigator.userAgent);
+    if (kbd) kbd.textContent = isMac ? '⌘K' : 'Ctrl K';
+
+    const show = () => {
+      overlay.classList.remove('hidden');
+      overlay.classList.add('flex');
+      overlay.setAttribute('aria-hidden', 'false');
+      setTimeout(() => input.focus(), 20);
+      loadPagefind();
+      render('', results);
+    };
+    const hide = () => {
+      overlay.classList.add('hidden');
+      overlay.classList.remove('flex');
+      overlay.setAttribute('aria-hidden', 'true');
+      input.value = '';
+      results.innerHTML = '';
+      lastItems = [];
+    };
+
+    open.addEventListener('click', show);
+    close.addEventListener('click', hide);
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) hide();
+    });
+
+    results.addEventListener('click', (e) => {
+      const link = e.target.closest('.search-item');
+      if (!link) return;
+      const idx = Number(link.dataset.idx);
+      const item = lastItems[idx];
+      if (item?.command) {
+        e.preventDefault();
+        runCommand(item.command);
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        show();
+      } else if (e.key === '/' && overlay.classList.contains('hidden')) {
+        const tag = document.activeElement?.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement?.isContentEditable) return;
+        e.preventDefault();
+        show();
+      } else if (e.key === 'Escape' && !overlay.classList.contains('hidden')) {
+        hide();
+      } else if (!overlay.classList.contains('hidden')) {
+        const selectable = lastItems
+          .map((it, i) => (it.type === 'item' ? i : -1))
+          .filter((i) => i >= 0);
+        if (!selectable.length) return;
+        const currentPos = selectable.indexOf(selectedIndex);
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          selectedIndex = selectable[(currentPos + 1) % selectable.length] ?? selectable[0];
+          highlight(results);
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          selectedIndex = selectable[(currentPos - 1 + selectable.length) % selectable.length] ?? selectable[0];
+          highlight(results);
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          activate(results);
+        }
+      }
+    });
+
+    let timer;
+    input.addEventListener('input', () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => render(input.value.trim(), results), 120);
+    });
+  };
+
+  bind();
+  document.addEventListener('astro:page-load', bind);
+</script>

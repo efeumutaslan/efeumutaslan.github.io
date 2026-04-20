@@ -1,0 +1,60 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { DEFAULT_LOCALE } from '../consts';
+import { localePath } from '../i18n/utils';
+import { ui } from '../i18n/ui';
+
+const locale = DEFAULT_LOCALE;
+const t = ui[locale];
+
+const messages = {
+  en: {
+    heading: 'Page not found',
+    body: "The page you're looking for doesn't exist or may have moved. Try searching, or head back home.",
+    home: 'Go to homepage',
+    blog: 'Browse blog posts',
+  },
+  tr: {
+    heading: 'Sayfa bulunamadı',
+    body: 'Aradığınız sayfa mevcut değil ya da taşınmış olabilir. Arama yapın veya anasayfaya dönün.',
+    home: 'Anasayfaya git',
+    blog: 'Blog yazılarına göz at',
+  },
+  de: {
+    heading: 'Seite nicht gefunden',
+    body: 'Die gesuchte Seite existiert nicht oder wurde verschoben. Versuchen Sie die Suche oder kehren Sie zur Startseite zurück.',
+    home: 'Zur Startseite',
+    blog: 'Blog durchsuchen',
+  },
+};
+const m = messages[locale];
+---
+
+<BaseLayout
+  title={m.heading}
+  description={m.body}
+  locale={locale}
+  pathWithoutLocale=""
+>
+  <section class="mx-auto flex min-h-[60vh] max-w-2xl flex-col items-center justify-center px-4 py-16 text-center sm:px-6">
+    <p class="text-6xl font-black tracking-tight text-brand-600 dark:text-brand-400">404</p>
+    <h1 class="mt-6 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+      {m.heading}
+    </h1>
+    <p class="mt-4 max-w-prose text-slate-600 dark:text-slate-400">{m.body}</p>
+    <div class="mt-8 flex flex-wrap justify-center gap-3">
+      <a
+        href={localePath(locale)}
+        class="inline-flex items-center rounded-md bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700"
+      >
+        {m.home}
+      </a>
+      <a
+        href={localePath(locale, 'blog')}
+        class="inline-flex items-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+      >
+        {m.blog}
+      </a>
+    </div>
+  </section>
+</BaseLayout>

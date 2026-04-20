@@ -1,0 +1,59 @@
+---
+import type { Locale } from '../consts';
+import { localePath } from '../i18n/utils';
+import { ui } from '../i18n/ui';
+
+interface Crumb {
+  label: string;
+  href?: string;
+}
+
+interface Props {
+  locale: Locale;
+  items: Crumb[];
+}
+
+const { locale, items } = Astro.props;
+const t = ui[locale];
+
+const homeLabel = t.nav.home;
+const crumbs: Crumb[] = [{ label: homeLabel, href: localePath(locale) }, ...items];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: crumbs.map((c, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: c.label,
+    ...(c.href ? { item: new URL(c.href, Astro.site ?? Astro.url).toString() } : {}),
+  })),
+};
+---
+
+<nav
+  aria-label="Breadcrumb"
+  class="mx-auto max-w-5xl px-4 pt-4 sm:px-6 text-xs text-slate-500 dark:text-slate-400"
+>
+  <ol class="flex flex-wrap items-center gap-1">
+    {crumbs.map((c, i) => (
+      <li class="flex items-center gap-1">
+        {i > 0 && (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3 w-3 text-slate-400" aria-hidden="true">
+            <path d="m9 6 6 6-6 6" />
+          </svg>
+        )}
+        {c.href && i < crumbs.length - 1 ? (
+          <a href={c.href} class="hover:text-brand-700 dark:hover:text-brand-300">
+            {c.label}
+          </a>
+        ) : (
+          <span class="text-slate-700 dark:text-slate-200" aria-current={i === crumbs.length - 1 ? 'page' : undefined}>
+            {c.label}
+          </span>
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />

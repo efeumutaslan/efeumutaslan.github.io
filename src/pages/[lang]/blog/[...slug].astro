@@ -1,0 +1,32 @@
+---
+import { type CollectionEntry, render } from 'astro:content';
+import { LOCALES, type Locale } from '../../../consts';
+import { getPublishedPosts, postSlug } from '../../../content-utils';
+import BlogPost from '../../../layouts/BlogPost.astro';
+import Callout from '../../../components/mdx/Callout.astro';
+import TCode from '../../../components/mdx/TCode.astro';
+import KeyRef from '../../../components/mdx/KeyRef.astro';
+import FileTree from '../../../components/mdx/FileTree.astro';
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  return posts.map((post) => ({
+    params: { lang: post.data.lang as Locale, slug: postSlug(post) },
+    props: { post, slug: postSlug(post) },
+  }));
+}
+
+type Props = { post: CollectionEntry<'blog'>; slug: string };
+
+const { lang } = Astro.params as { lang: Locale };
+const { post, slug } = Astro.props;
+const { Content, headings } = await render(post);
+
+if (!LOCALES.includes(lang)) {
+  throw new Error(`Unknown locale: ${lang}`);
+}
+---
+
+<BlogPost post={post} locale={lang} slug={slug} headings={headings} body={post.body ?? ''}>
+  <Content components={{ Callout, TCode, KeyRef, FileTree }} />
+</BlogPost>

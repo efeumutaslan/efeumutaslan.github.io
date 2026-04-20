@@ -1,0 +1,19 @@
+---
+interface Props {
+  code: string;
+  title?: string;
+}
+
+const { code, title } = Astro.props;
+const upper = code.toUpperCase();
+---
+
+<span
+  class="inline-flex items-center gap-1 rounded-md border border-indigo-200 bg-indigo-50 px-1.5 py-0.5 font-mono text-[0.85em] font-semibold text-indigo-800 dark:border-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-200"
+  title={title ?? `SAP transaction code ${upper}`}
+>
+  <svg viewBox="0 0 24 24" fill="currentColor" class="h-3 w-3" aria-hidden="true">
+    <path d="M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5Zm2 0v11h14V5H5Zm2 14h10v2H7v-2Z" />
+  </svg>
+  <span>{upper}</span>
+</span>

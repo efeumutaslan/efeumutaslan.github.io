@@ -1,0 +1,33 @@
+---
+import { LOCALES, type Locale } from '../../consts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { ui } from '../../i18n/ui';
+
+export async function getStaticPaths() {
+  return LOCALES.map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params as { lang: Locale };
+const t = ui[lang];
+---
+
+<BaseLayout
+  title={t.about.title}
+  description={t.about.intro}
+  locale={lang}
+  pathWithoutLocale="about"
+>
+  <section class="mx-auto max-w-3xl px-4 py-16 sm:px-6">
+    <h1 class="text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
+      {t.about.title}
+    </h1>
+    <p class="mt-6 text-lg text-slate-600 dark:text-slate-400">{t.about.intro}</p>
+    <ul class="mt-8 grid gap-3 text-slate-700 dark:text-slate-300">
+      <li>· SAP BTP &amp; Cloud Foundry</li>
+      <li>· ABAP Cloud &amp; RESTful Application Programming (RAP)</li>
+      <li>· Fiori Elements &amp; SAPUI5</li>
+      <li>· Cloud Application Programming model (CAP)</li>
+      <li>· S/4HANA extensibility</li>
+    </ul>
+  </section>
+</BaseLayout>

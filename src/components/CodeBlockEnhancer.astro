@@ -1,0 +1,189 @@
+---
+// Global enhancer: adds a language badge and a copy-to-clipboard button
+// to every Shiki-rendered <pre class="astro-code"> on the page.
+---
+
+<script>
+  const LANG_LABELS: Record<string, string> = {
+    abap: 'ABAP',
+    js: 'JavaScript',
+    javascript: 'JavaScript',
+    ts: 'TypeScript',
+    typescript: 'TypeScript',
+    json: 'JSON',
+    yaml: 'YAML',
+    yml: 'YAML',
+    xml: 'XML',
+    html: 'HTML',
+    css: 'CSS',
+    sql: 'SQL',
+    bash: 'Shell',
+    sh: 'Shell',
+    shell: 'Shell',
+    md: 'Markdown',
+    mdx: 'MDX',
+    cds: 'CDS',
+    cap: 'CAP',
+    text: '',
+    plaintext: '',
+  };
+
+  const COPY_STRINGS: Record<string, { copy: string; copied: string }> = {
+    en: { copy: 'Copy', copied: 'Copied' },
+    tr: { copy: 'Kopyala', copied: 'Kopyalandı' },
+    de: { copy: 'Kopieren', copied: 'Kopiert' },
+  };
+
+  const strings = () => {
+    const lang = document.documentElement.lang?.slice(0, 2) || 'en';
+    return COPY_STRINGS[lang] ?? COPY_STRINGS.en;
+  };
+
+  let toastTimer: number | undefined;
+  const showToast = (msg: string) => {
+    let toast = document.getElementById('copy-toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'copy-toast';
+      toast.className = 'copy-toast';
+      toast.setAttribute('role', 'status');
+      toast.setAttribute('aria-live', 'polite');
+      document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    requestAnimationFrame(() => toast!.classList.add('is-visible'));
+    clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => {
+      toast!.classList.remove('is-visible');
+    }, 1400);
+  };
+
+  const enhance = () => {
+    const blocks = document.querySelectorAll<HTMLPreElement>('pre.astro-code');
+    blocks.forEach((pre) => {
+      if (pre.dataset.enhanced === '1') return;
+      pre.dataset.enhanced = '1';
+
+      const lang = (pre.getAttribute('data-language') || '').toLowerCase();
+      const label = LANG_LABELS[lang] ?? lang.toUpperCase();
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'code-block-wrapper';
+      pre.parentNode?.insertBefore(wrapper, pre);
+      wrapper.appendChild(pre);
+
+      const toolbar = document.createElement('div');
+      toolbar.className = 'code-block-toolbar';
+
+      if (label) {
+        const badge = document.createElement('span');
+        badge.className = 'code-block-lang';
+        badge.textContent = label;
+        toolbar.appendChild(badge);
+      }
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      const { copy, copied } = strings();
+      btn.className = 'code-block-copy';
+      btn.setAttribute('aria-label', copy);
+      btn.textContent = copy;
+      btn.addEventListener('click', async () => {
+        const code = pre.querySelector('code')?.innerText ?? pre.innerText;
+        try {
+          await navigator.clipboard.writeText(code);
+          btn.textContent = copied;
+          btn.classList.add('is-copied');
+          showToast(copied);
+          setTimeout(() => {
+            btn.textContent = copy;
+            btn.classList.remove('is-copied');
+          }, 1500);
+        } catch {
+          /* clipboard blocked */
+        }
+      });
+      toolbar.appendChild(btn);
+      wrapper.appendChild(toolbar);
+    });
+  };
+
+  enhance();
+  document.addEventListener('astro:page-load', enhance);
+</script>
+
+<style is:global>
+  .code-block-wrapper {
+    position: relative;
+    margin: 1.25rem 0;
+  }
+  .code-block-wrapper > pre.astro-code {
+    border-radius: 0.5rem;
+    padding: 2.25rem 1rem 1rem 1rem;
+    border: 1px solid rgb(226 232 240);
+    overflow-x: auto;
+  }
+  :is(.dark) .code-block-wrapper > pre.astro-code {
+    border-color: rgb(30 41 59);
+  }
+  .code-block-toolbar {
+    position: absolute;
+    top: 0.4rem;
+    left: 0.6rem;
+    right: 0.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    pointer-events: none;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+  }
+  .code-block-lang {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: rgb(100 116 139);
+    background: rgba(241, 245, 249, 0.9);
+    padding: 0.1rem 0.5rem;
+    border-radius: 9999px;
+  }
+  :is(.dark) .code-block-lang {
+    color: rgb(148 163 184);
+    background: rgba(15, 23, 42, 0.7);
+  }
+  .code-block-copy {
+    pointer-events: auto;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: rgb(71 85 105);
+    background: rgba(241, 245, 249, 0.9);
+    border: 1px solid rgb(226 232 240);
+    padding: 0.2rem 0.55rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+  }
+  .code-block-copy:hover {
+    color: rgb(15 23 42);
+    border-color: rgb(203 213 225);
+  }
+  .code-block-copy.is-copied {
+    color: rgb(22 101 52);
+    background: rgb(220 252 231);
+    border-color: rgb(187 247 208);
+  }
+  :is(.dark) .code-block-copy {
+    color: rgb(203 213 225);
+    background: rgba(15, 23, 42, 0.7);
+    border-color: rgb(51 65 85);
+  }
+  :is(.dark) .code-block-copy:hover {
+    color: white;
+    border-color: rgb(71 85 105);
+  }
+  :is(.dark) .code-block-copy.is-copied {
+    color: rgb(134 239 172);
+    background: rgba(20, 83, 45, 0.6);
+    border-color: rgb(22 101 52);
+  }
+</style>

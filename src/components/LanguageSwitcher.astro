@@ -1,0 +1,67 @@
+---
+import { LOCALES, type Locale } from '../consts';
+import { languageNames, ui } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+  /** Current path without a locale prefix, e.g. "blog" or "about". */
+  pathWithoutLocale: string;
+  /**
+   * Optional per-locale path overrides. If provided, a locale missing from
+   * this map is shown as disabled (no translation available).
+   */
+  translations?: Partial<Record<Locale, string>>;
+}
+
+const { locale, pathWithoutLocale, translations } = Astro.props;
+const trimmed = pathWithoutLocale.replace(/^\/+/, '').replace(/\/+$/, '');
+const defaultPath = (loc: Locale) => (trimmed ? `/${loc}/${trimmed}/` : `/${loc}/`);
+
+const pathFor = (loc: Locale): string | null => {
+  if (!translations) return defaultPath(loc);
+  if (translations[loc]) return translations[loc] as string;
+  return null;
+};
+
+const t = ui[locale];
+const unavailable: Record<Locale, string> = {
+  en: ' — not available',
+  tr: ' — çeviri yok',
+  de: ' — nicht verfügbar',
+};
+---
+
+<div class="relative">
+  <label class="sr-only" for="language-switcher">{t.language.label}</label>
+  <select
+    id="language-switcher"
+    onchange="if(this.value)window.location.href=this.value"
+    class="appearance-none rounded-md border border-slate-200 bg-white px-3 py-1.5 pr-8 text-sm font-medium text-slate-700 transition hover:bg-slate-100 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+  >
+    {
+      LOCALES.map((loc) => {
+        const target = pathFor(loc);
+        if (target) {
+          return (
+            <option value={target} selected={loc === locale}>
+              {languageNames[loc]}
+            </option>
+          );
+        }
+        return (
+          <option value="" disabled>
+            {languageNames[loc]}{unavailable[locale]}
+          </option>
+        );
+      })
+    }
+  </select>
+  <svg
+    class="pointer-events-none absolute top-1/2 right-2 h-4 w-4 -translate-y-1/2 text-slate-500 dark:text-slate-400"
+    viewBox="0 0 20 20"
+    fill="currentColor"
+    aria-hidden="true"
+  >
+    <path d="M5.25 7.5L10 12.25 14.75 7.5z"></path>
+  </svg>
+</div>

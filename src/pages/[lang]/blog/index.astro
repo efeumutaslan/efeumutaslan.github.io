@@ -1,0 +1,104 @@
+---
+import { Image } from 'astro:assets';
+import { LOCALES, type Locale } from '../../../consts';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import { formatDate, localePath, readingTime, slugifyTag } from '../../../i18n/utils';
+import { ui } from '../../../i18n/ui';
+import { getPublishedPosts, postSlug } from '../../../content-utils';
+
+export async function getStaticPaths() {
+  return LOCALES.map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params as { lang: Locale };
+const t = ui[lang];
+
+const posts = (await getPublishedPosts(lang)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+
+const tagCounts = new Map<string, { label: string; count: number }>();
+for (const p of posts) {
+  for (const raw of p.data.tags) {
+    const slug = slugifyTag(raw);
+    const existing = tagCounts.get(slug);
+    if (existing) existing.count += 1;
+    else tagCounts.set(slug, { label: raw, count: 1 });
+  }
+}
+const tagList = Array.from(tagCounts.entries())
+  .map(([slug, v]) => ({ slug, label: v.label, count: v.count }))
+  .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+---
+
+<BaseLayout
+  title={t.blog.title}
+  description={t.blog.subtitle}
+  locale={lang}
+  pathWithoutLocale="blog"
+>
+  <Breadcrumbs locale={lang} items={[{ label: t.blog.title }]} />
+  <section class="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+    <header class="mb-10">
+      <h1 class="text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
+        {t.blog.title}
+      </h1>
+      <p class="mt-2 text-lg text-slate-600 dark:text-slate-400">{t.blog.subtitle}</p>
+      {tagList.length > 0 && (
+        <div class="mt-6 flex flex-wrap gap-2">
+          {tagList.map((tg) => (
+            <a
+              href={localePath(lang, `blog/tag/${tg.slug}`)}
+              class="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700 transition hover:border-brand-400 hover:bg-brand-50 hover:text-brand-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-brand-500 dark:hover:bg-brand-900/40 dark:hover:text-brand-300"
+            >
+              #{tg.label}
+              <span class="ml-1 text-slate-400 dark:text-slate-500">{tg.count}</span>
+            </a>
+          ))}
+        </div>
+      )}
+    </header>
+
+    <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {posts.map((post) => {
+        const slug = postSlug(post);
+        return (
+          <li class="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800 dark:bg-slate-900">
+            <a href={localePath(lang, `blog/${slug}`)} class="block h-full">
+              {post.data.heroImage && (
+                <Image
+                  src={post.data.heroImage}
+                  alt={post.data.title}
+                  width={720}
+                  height={360}
+                  class="h-44 w-full object-cover"
+                  transition:name={`hero-${post.id}`}
+                />
+              )}
+              <div class="p-5">
+                <div class="mb-2 flex flex-wrap gap-1">
+                  {post.data.tags.slice(0, 3).map((tag) => (
+                    <span class="rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-medium text-brand-700 dark:bg-brand-900/40 dark:text-brand-300">
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+                <h2 class="mb-2 text-lg font-semibold text-slate-900 group-hover:text-brand-600 dark:text-white dark:group-hover:text-brand-400">
+                  {post.data.title}
+                </h2>
+                <p class="line-clamp-3 text-sm text-slate-600 dark:text-slate-400">
+                  {post.data.description}
+                </p>
+                <p class="mt-3 text-xs text-slate-500 dark:text-slate-400">
+                  {formatDate(post.data.pubDate, lang)}
+                  {post.body && <> · {readingTime(post.body, lang)}</>}
+                </p>
+              </div>
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+  </section>
+</BaseLayout>

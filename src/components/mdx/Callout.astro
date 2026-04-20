@@ -1,0 +1,43 @@
+---
+import type { Locale } from '../../consts';
+
+interface Props {
+  type?: 'note' | 'tip' | 'warning' | 'sap';
+  title?: string;
+  lang?: Locale;
+}
+
+const { type = 'note', title, lang = 'en' } = Astro.props;
+
+const defaults: Record<NonNullable<Props['type']>, Record<Locale, string>> = {
+  note:    { en: 'Note',    tr: 'Not',    de: 'Hinweis' },
+  tip:     { en: 'Tip',     tr: 'İpucu',  de: 'Tipp' },
+  warning: { en: 'Warning', tr: 'Uyarı',  de: 'Warnung' },
+  sap:     { en: 'SAP',     tr: 'SAP',    de: 'SAP' },
+};
+
+const label = title ?? defaults[type][lang];
+
+const variants: Record<NonNullable<Props['type']>, string> = {
+  note: 'border-sky-300 bg-sky-50 text-sky-900 dark:border-sky-700 dark:bg-sky-900/30 dark:text-sky-100',
+  tip: 'border-emerald-300 bg-emerald-50 text-emerald-900 dark:border-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-100',
+  warning: 'border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-100',
+  sap: 'border-indigo-300 bg-indigo-50 text-indigo-900 dark:border-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-100',
+};
+
+const headingColor: Record<NonNullable<Props['type']>, string> = {
+  note: 'text-sky-700 dark:text-sky-300',
+  tip: 'text-emerald-700 dark:text-emerald-300',
+  warning: 'text-amber-700 dark:text-amber-300',
+  sap: 'text-indigo-700 dark:text-indigo-300',
+};
+---
+
+<aside class={`my-6 rounded-lg border-l-4 p-4 ${variants[type]}`} role="note">
+  <p class={`mb-1 text-xs font-semibold uppercase tracking-wide ${headingColor[type]}`}>
+    {label}
+  </p>
+  <div class="[&>p]:my-1 [&>p:first-child]:mt-0 [&>p:last-child]:mb-0">
+    <slot />
+  </div>
+</aside>

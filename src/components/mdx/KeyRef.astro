@@ -1,0 +1,19 @@
+---
+interface Props {
+  keys: string;
+}
+
+const { keys } = Astro.props;
+const parts = keys.split('+').map((k) => k.trim());
+---
+
+<span class="inline-flex items-center gap-0.5 align-middle font-sans text-[0.9em]">
+  {parts.map((k, i) => (
+    <>
+      {i > 0 && <span class="mx-0.5 text-slate-400">+</span>}
+      <kbd class="rounded border border-slate-300 bg-slate-100 px-1.5 py-0.5 text-[0.85em] font-semibold text-slate-700 shadow-sm dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200">
+        {k}
+      </kbd>
+    </>
+  ))}
+</span>

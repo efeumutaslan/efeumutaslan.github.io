@@ -1,0 +1,150 @@
+---
+import { Image } from 'astro:assets';
+import { LOCALES, type Locale } from '../../consts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDate, localePath, readingTime, slugifyTag } from '../../i18n/utils';
+import { ui } from '../../i18n/ui';
+import { getPublishedPosts, postSlug } from '../../content-utils';
+
+export async function getStaticPaths() {
+  return LOCALES.map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params as { lang: Locale };
+const t = ui[lang];
+
+const allPosts = (await getPublishedPosts(lang)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+const featured = allPosts[0];
+const rest = allPosts.slice(1, 7);
+
+const topics = ['SAP BTP', 'ABAP Cloud', 'RAP', 'SAPUI5', 'Fiori Elements', 'CAP', 'S/4HANA'];
+---
+
+<BaseLayout title={t.siteTitle} description={t.siteDescription} locale={lang} pathWithoutLocale="">
+  <section class="relative overflow-hidden border-b border-slate-200 dark:border-slate-800">
+    <div class="hero-mesh absolute inset-0" aria-hidden="true"></div>
+    <div class="relative mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-24">
+      <p class="mb-3 text-sm font-semibold tracking-wide text-brand-700 uppercase dark:text-brand-300">
+        {t.home.heroKicker}
+      </p>
+      <h1 class="font-display max-w-3xl text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl dark:text-white">
+        {t.home.heroTitle}
+      </h1>
+      <p class="mt-6 max-w-2xl text-lg text-slate-600 dark:text-slate-400">
+        {t.home.heroSubtitle}
+      </p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a
+          href={localePath(lang, 'blog')}
+          class="inline-flex items-center rounded-md bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700"
+        >
+          {t.home.ctaRead}
+        </a>
+        <a
+          href={localePath(lang, 'about')}
+          class="inline-flex items-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+        >
+          {t.home.ctaAbout}
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+    <h2 class="mb-6 text-sm font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400">
+      {t.home.topics}
+    </h2>
+    <div class="flex flex-wrap gap-2">
+      {topics.map((tp) => (
+        <a
+          href={localePath(lang, `blog/tag/${slugifyTag(tp)}`)}
+          class="rounded-full border border-slate-200 bg-white px-3 py-1 text-sm text-slate-700 transition hover:border-brand-400 hover:bg-brand-50 hover:text-brand-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-brand-500 dark:hover:bg-brand-900/40 dark:hover:text-brand-300"
+        >
+          {tp}
+        </a>
+      ))}
+    </div>
+  </section>
+
+  {featured && (
+    <section class="mx-auto max-w-5xl px-4 pt-4 pb-8 sm:px-6">
+      <a
+        href={localePath(lang, `blog/${postSlug(featured)}`)}
+        class="group grid gap-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-lg md:grid-cols-5 dark:border-slate-800 dark:bg-slate-900"
+      >
+        {featured.data.heroImage && (
+          <div class="md:col-span-3 overflow-hidden">
+            <Image
+              src={featured.data.heroImage}
+              alt={featured.data.title}
+              width={1200}
+              height={700}
+              class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+              transition:name={`hero-${featured.id}`}
+            />
+          </div>
+        )}
+        <div class="flex flex-col justify-center gap-3 p-6 md:col-span-2">
+          <div class="flex flex-wrap gap-1">
+            {featured.data.tags.slice(0, 3).map((tag) => (
+              <span class="rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-medium text-brand-700 dark:bg-brand-900/40 dark:text-brand-300">
+                #{tag}
+              </span>
+            ))}
+          </div>
+          <h3 class="font-display text-2xl font-bold text-slate-900 group-hover:text-brand-700 dark:text-white dark:group-hover:text-brand-300">
+            {featured.data.title}
+          </h3>
+          <p class="line-clamp-3 text-sm text-slate-600 dark:text-slate-400">
+            {featured.data.description}
+          </p>
+          <p class="text-xs text-slate-500 dark:text-slate-400">
+            {formatDate(featured.data.pubDate, lang)}
+            {featured.body && <> · {readingTime(featured.body, lang)}</>}
+          </p>
+        </div>
+      </a>
+    </section>
+  )}
+
+  <section class="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+    <h2 class="font-display mb-6 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+      {t.home.latestPosts}
+    </h2>
+    <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {rest.map((post) => {
+        const slug = postSlug(post);
+        return (
+          <li class="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800 dark:bg-slate-900">
+            <a href={localePath(lang, `blog/${slug}`)} class="block">
+              {post.data.heroImage && (
+                <Image
+                  src={post.data.heroImage}
+                  alt={post.data.title}
+                  width={720}
+                  height={360}
+                  class="h-44 w-full object-cover"
+                  transition:name={`hero-${post.id}`}
+                />
+              )}
+              <div class="p-5">
+                <p class="mb-2 text-xs text-slate-500 dark:text-slate-400">
+                  {formatDate(post.data.pubDate, lang)}
+                  {post.body && <> · {readingTime(post.body, lang)}</>}
+                </p>
+                <h3 class="mb-2 text-lg font-semibold text-slate-900 group-hover:text-brand-600 dark:text-white dark:group-hover:text-brand-400">
+                  {post.data.title}
+                </h3>
+                <p class="line-clamp-3 text-sm text-slate-600 dark:text-slate-400">
+                  {post.data.description}
+                </p>
+              </div>
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+  </section>
+</BaseLayout>

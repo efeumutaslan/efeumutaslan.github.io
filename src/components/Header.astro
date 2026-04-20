@@ -1,0 +1,132 @@
+---
+import type { Locale } from '../consts';
+import { localePath } from '../i18n/utils';
+import { ui } from '../i18n/ui';
+import LanguageSwitcher from './LanguageSwitcher.astro';
+import Search from './Search.astro';
+import ThemeToggle from './ThemeToggle.astro';
+
+interface Props {
+  locale: Locale;
+  pathWithoutLocale: string;
+  translations?: Partial<Record<Locale, string>>;
+}
+
+const { locale, pathWithoutLocale, translations } = Astro.props;
+const t = ui[locale];
+
+const withSlash = (p: string) => (p.endsWith('/') ? p : p + '/');
+const currentPath = withSlash(Astro.url.pathname);
+const isActive = (href: string, exact: boolean) => {
+  const h = withSlash(href);
+  return exact ? currentPath === h : currentPath === h || currentPath.startsWith(h);
+};
+
+const links = [
+  { href: localePath(locale), label: t.nav.home, match: localePath(locale), exact: true },
+  { href: localePath(locale, 'blog'), label: t.nav.blog, match: localePath(locale, 'blog'), exact: false },
+  { href: localePath(locale, 'about'), label: t.nav.about, match: localePath(locale, 'about'), exact: false },
+];
+---
+
+<header
+  transition:name="site-header"
+  class="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur dark:border-slate-800 dark:bg-slate-950/80"
+>
+  <div class="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+    <a
+      href={localePath(locale)}
+      class="flex items-center gap-2 text-base font-bold tracking-tight text-slate-900 hover:text-brand-600 dark:text-white dark:hover:text-brand-400"
+    >
+      <span
+        class="inline-flex h-7 w-7 items-center justify-center rounded-md bg-brand-600 text-white shadow-sm"
+        aria-hidden="true"
+      >
+        S
+      </span>
+      {t.siteTitle}
+    </a>
+
+    <nav class="hidden items-center gap-1 md:flex">
+      {
+        links.map((l) => (
+          <a
+            href={l.href}
+            class:list={[
+              'rounded-md px-3 py-2 text-sm font-medium transition',
+              isActive(l.match, l.exact)
+                ? 'bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300'
+                : 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
+            ]}
+          >
+            {l.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="flex items-center gap-2">
+      <Search locale={locale} />
+      <LanguageSwitcher locale={locale} pathWithoutLocale={pathWithoutLocale} translations={translations} />
+      <ThemeToggle locale={locale} />
+      <button
+        id="mobile-nav-toggle"
+        type="button"
+        class="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 text-slate-700 md:hidden dark:border-slate-700 dark:text-slate-200"
+        aria-label="Menu"
+        aria-expanded="false"
+        aria-controls="mobile-nav"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          class="h-5 w-5"
+          aria-hidden="true"
+        >
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <nav
+    id="mobile-nav"
+    class="hidden border-t border-slate-200 md:hidden dark:border-slate-800"
+  >
+    <div class="mx-auto flex max-w-5xl flex-col gap-1 px-4 py-3 sm:px-6">
+      {
+        links.map((l) => (
+          <a
+            href={l.href}
+            class:list={[
+              'rounded-md px-3 py-2 text-sm font-medium transition',
+              isActive(l.match, l.exact)
+                ? 'bg-brand-50 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300'
+                : 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
+            ]}
+          >
+            {l.label}
+          </a>
+        ))
+      }
+    </div>
+  </nav>
+</header>
+
+<script>
+  const init = () => {
+    const btn = document.getElementById('mobile-nav-toggle');
+    const nav = document.getElementById('mobile-nav');
+    if (!btn || !nav) return;
+    btn.addEventListener('click', () => {
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!expanded));
+      nav.classList.toggle('hidden');
+    });
+  };
+  init();
+  document.addEventListener('astro:after-swap', init);
+</script>

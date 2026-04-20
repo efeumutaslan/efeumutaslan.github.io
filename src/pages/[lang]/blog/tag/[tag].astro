@@ -1,0 +1,163 @@
+---
+import { Image } from 'astro:assets';
+import { LOCALES, type Locale } from '../../../../consts';
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../../components/Breadcrumbs.astro';
+import { formatDate, localePath, slugifyTag } from '../../../../i18n/utils';
+import { ui } from '../../../../i18n/ui';
+import { getPublishedPosts, postSlug } from '../../../../content-utils';
+
+export async function getStaticPaths() {
+  const allPosts = await getPublishedPosts();
+  const featured = ['SAP BTP', 'ABAP Cloud', 'RAP', 'SAPUI5', 'Fiori Elements', 'CAP', 'S/4HANA'];
+
+  const paths: Array<{
+    params: { lang: Locale; tag: string };
+    props: { tagLabel: string };
+  }> = [];
+
+  for (const lang of LOCALES) {
+    const tagMap = new Map<string, string>();
+    for (const tp of featured) tagMap.set(slugifyTag(tp), tp);
+    for (const post of allPosts) {
+      if (post.data.lang !== lang) continue;
+      for (const tag of post.data.tags) {
+        const slug = slugifyTag(tag);
+        if (!tagMap.has(slug)) tagMap.set(slug, tag);
+      }
+    }
+    for (const [slug, label] of tagMap) {
+      paths.push({ params: { lang, tag: slug }, props: { tagLabel: label } });
+    }
+  }
+
+  return paths;
+}
+
+const { lang, tag } = Astro.params as { lang: Locale; tag: string };
+const { tagLabel } = Astro.props;
+const t = ui[lang];
+
+const allPostsAny = await getPublishedPosts();
+const posts = allPostsAny
+  .filter((p) => p.data.lang === lang && p.data.tags.some((x) => slugifyTag(x) === tag))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const featured = new Set(['SAP BTP', 'ABAP Cloud', 'RAP', 'SAPUI5', 'Fiori Elements', 'CAP', 'S/4HANA'].map(slugifyTag));
+const translations: Partial<Record<Locale, string>> = {};
+for (const loc of LOCALES) {
+  const localHasTag = allPostsAny.some(
+    (p) => p.data.lang === loc && p.data.tags.some((x) => slugifyTag(x) === tag),
+  );
+  if (localHasTag || featured.has(tag)) {
+    translations[loc] = localePath(loc, `blog/tag/${tag}`);
+  }
+}
+
+const empty = {
+  en: 'No posts tagged',
+  tr: 'Bu etikete ait yazı yok',
+  de: 'Keine Beiträge mit diesem Tag',
+}[lang];
+
+const allPostsLabel = {
+  en: '← All posts',
+  tr: '← Tüm yazılar',
+  de: '← Alle Beiträge',
+}[lang];
+
+const filteredByLabel = {
+  en: 'Filtered by tag',
+  tr: 'Etikete göre filtrelendi',
+  de: 'Nach Tag gefiltert',
+}[lang];
+---
+
+<BaseLayout
+  title={`${tagLabel} · ${t.blog.title}`}
+  description={`${t.blog.subtitle} (${tagLabel})`}
+  locale={lang}
+  pathWithoutLocale={`blog/tag/${tag}`}
+  translations={translations}
+  extraFeed={posts.length > 0 ? { title: `${t.siteTitle} · #${tagLabel}`, href: `/rss-${lang}-${tag}.xml` } : undefined}
+>
+  <Breadcrumbs
+    locale={lang}
+    items={[
+      { label: t.blog.title, href: localePath(lang, 'blog') },
+      { label: `#${tagLabel}` },
+    ]}
+  />
+  <section class="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+    <header class="mb-10">
+      <a
+        href={localePath(lang, 'blog')}
+        class="inline-flex items-center text-sm text-brand-700 hover:underline dark:text-brand-300"
+      >
+        {allPostsLabel}
+      </a>
+      <p class="mt-4 text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400">
+        {filteredByLabel}
+      </p>
+      <h1 class="mt-2 text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
+        #{tagLabel}
+      </h1>
+      {posts.length > 0 && (
+        <a
+          href={`/rss-${lang}-${tag}.xml`}
+          class="mt-4 inline-flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1 text-xs font-medium text-slate-600 transition hover:border-orange-400 hover:bg-orange-50 hover:text-orange-700 dark:border-slate-700 dark:text-slate-400 dark:hover:border-orange-500 dark:hover:bg-orange-900/30 dark:hover:text-orange-300"
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor" class="h-3 w-3" aria-hidden="true">
+            <path d="M4 4a16 16 0 0 1 16 16h-3A13 13 0 0 0 4 7V4Zm0 6a10 10 0 0 1 10 10h-3a7 7 0 0 0-7-7v-3Zm1.5 7.5a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z" />
+          </svg>
+          RSS
+        </a>
+      )}
+    </header>
+
+    {posts.length === 0 ? (
+      <p class="rounded-lg border border-dashed border-slate-300 p-8 text-center text-slate-600 dark:border-slate-700 dark:text-slate-400">
+        {empty} <span class="font-semibold">#{tagLabel}</span>
+      </p>
+    ) : (
+      <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {posts.map((post) => {
+          const slug = postSlug(post);
+          return (
+            <li class="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md dark:border-slate-800 dark:bg-slate-900">
+              <a href={localePath(lang, `blog/${slug}`)} class="block h-full">
+                {post.data.heroImage && (
+                  <Image
+                    src={post.data.heroImage}
+                    alt={post.data.title}
+                    width={720}
+                    height={360}
+                    class="h-44 w-full object-cover"
+                  />
+                )}
+                <div class="p-5">
+                  <div class="mb-2 flex flex-wrap gap-1">
+                    {post.data.tags.slice(0, 3).map((tp) => (
+                      <span class="rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-medium text-brand-700 dark:bg-brand-900/40 dark:text-brand-300">
+                        #{tp}
+                      </span>
+                    ))}
+                  </div>
+                  <h2 class="mb-2 text-lg font-semibold text-slate-900 group-hover:text-brand-600 dark:text-white dark:group-hover:text-brand-400">
+                    {post.data.title}
+                  </h2>
+                  <p class="line-clamp-3 text-sm text-slate-600 dark:text-slate-400">
+                    {post.data.description}
+                  </p>
+                  <p class="mt-3 text-xs text-slate-500 dark:text-slate-400">
+                    {formatDate(post.data.pubDate, lang)}
+                  </p>
+                </div>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    )}
+  </section>
+</BaseLayout>

@@ -1,0 +1,20 @@
+---
+import type { Locale } from '../consts';
+import { ui } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = ui[locale];
+const year = new Date().getFullYear();
+---
+
+<footer transition:name="site-footer" class="mt-16 border-t border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900/40">
+  <div
+    class="mx-auto flex max-w-5xl flex-col items-center justify-between gap-2 px-4 py-6 text-sm text-slate-600 sm:flex-row sm:px-6 dark:text-slate-400"
+  >
+    <p>&copy; {year} {t.siteTitle}. {t.footer.rights}</p>
+    <p class="opacity-80">{t.footer.builtWith}</p>
+  </div>
+</footer>
